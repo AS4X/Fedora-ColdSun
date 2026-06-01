@@ -54,9 +54,6 @@ else
     mv zen /opt/zen/ # "Installation"
 	#Registering application PATH
 	echo -e 'export PATH="$PATH:/opt/zen"' >> /home/$USERNAME/.zshrc
-	###########    Zen Backup Install    ################
-	curl -fsSL "https://raw.githubusercontent.com/AS4X/Fedora-ColdSun/refs/heads/main/src/zen-config.tar" -o /home/$USERNAME/.config/zen/zen-config.tar
-	tar -xf /home/$USERNAME/.config/zen/zen-config.tar --directory /home/$USERNAME/.config/zen/
 fi
 
 ################# VS Code ####################
