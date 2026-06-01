@@ -1,6 +1,7 @@
 #!/bin/bash
 
 stage_1() {
+echo ""
 echo "#######################################"
 echo "#####---      New Packages     ---#####"
 echo "#######################################"
@@ -11,7 +12,7 @@ echo -e "###--- Running Desktop config Stage 1 ---###\n Installing new packages.
 echo -e "Enabling additional repositories."
 echo -e "Enabling Alacritty repository."
 dnf copr enable pschyska/alacritty                   
-NEWPKG=(git zsh alacritty micro nmap btop keepassxc)
+NEWPKG=(git zsh alacritty micro nmap btop keepassxc tmux)
 
 echo -e "Installing packages through RPM...\n"
 for pkg in "${NEWPKG[@]}"; do
@@ -26,6 +27,19 @@ done
 #//        Unmanaged Packages       \\#
 #// #####                      #### \\#
 echo -e "Installing unmanaged packages!\n"
+
+################ Oh My Zsh! ################
+if [ -d /home/$USERNAME/.oh-my-zsh ]; then
+    echo "Oh My Zsh configuration files found"
+else
+	echo "Downloading Oh My Zsh!"
+	su - "$USERNAME" -c 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
+	# Configure Shell theme!
+	sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="af-magic"/' /home/$USERNAME/.zshrc
+	# Enabling Zsh
+	chsh -s /bin/zsh $USERNAME
+	source /home/$USERNAME/.zshrc
+fi
 
 ############### Zen Browser ##################
 
@@ -68,25 +82,11 @@ else
 	dnf config-manager addrepo --from-repofile=https://download.sublimetext.com/rpm/stable/x86_64/sublime-text.repo
 	dnf install -y sublime-text
 fi
-################ Oh My Zsh! ################
-
-if [ -f /home/$USERNAME/.zshrc ]; then
-	echo "Oh My Zsh configuration file found"
-else
-	echo "Downloading Oh My Zsh!"
-	su - "$USERNAME" -c 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
-fi
-# Configure Shell theme!
-sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="af-magic"/' /home/$USERNAME/.zshrc
-# Enabling Zsh
-chsh -s /bin/zsh $USERNAME
-source /home/$USERNAME/.zshrc
-
 ### END STAGE 1 ###
 }
 
 stage_2() {
-
+echo ""
 echo "#######################################"
 echo "#####---       Debloater       ---#####"
 echo "#######################################"
@@ -115,7 +115,7 @@ done
 }
 
 stage_3(){
-
+echo ""
 echo "#######################################"
 echo "#####---     System Config     ---#####"
 echo '#######################################'
@@ -139,12 +139,13 @@ fi
 set_theme(){
 
 	###--- Install Orchis
+	echo ""
 	echo "..............................."
 	echo ".......     Themes     ........"
 	echo '...............................'
 	echo -e "\nInstalling Orchis theme\n"
 
-	if [ -d /home/$USERNAME/.local/share/plasma/desktoptheme/Orchis-dark ]; then
+	if [ -d /usr/share/plasma/desktoptheme/Orchis-dark ]; then
 		echo "Orchis theme is already installed"
 	else
 		git clone https://github.com/vinceliuice/Orchis-kde.git
@@ -168,13 +169,14 @@ set_desktop(){
 		echo "Downloading image: $img"
 		curl -fsSL "https://raw.githubusercontent.com/AS4X/Fedora-ColdSun/refs/heads/main/img/$img" -o "/home/$USERNAME/Pictures/Bck-img/$img"
 	done
-	plasma-apply-wallpaperimage "/home/$USERNAME/Pictures/Bck-img/${FILENAMES[1]}"
+	su $USERNAME sh -c "$(plasma-apply-wallpaperimage "/home/$USERNAME/Pictures/Bck-img/neon-liquid2.jpg")"
 
 	###--- Download icon pack
 	TMPDOTLOCAL="/home/$USERNAME/tmpdotlocal"
 	mkdir $TMPDOTLOCAL
 	curl -fL "https://raw.githubusercontent.com/AS4X/Fedora-ColdSun/refs/heads/main/src/dotlocal-share-icons.tar" -o "$TMPDOTLOCAL/dotlocal-share-icons.tar"
-	tar -xf "$TMPDOTLOCAL/dotlocal-share-icons.tar"
+	tar -xf "$TMPDOTLOCAL/dotlocal-share-icons.tar" -C "$TMPDOTLOCAL"
+	mv "$TMPDOTLOCAL/home/$USERNAME/.local/share/icons" "/home/$USERNAME/.local/share"
 
 	###--- KDE Desktop Settings
 	DOTCONF=(dolphinrc 
@@ -204,6 +206,7 @@ elif [ $OPTION = 'n' ]; then
 else
 	echo -e "\nInvalid selection, skipping computer hostname update."
 fi
+
 set_theme ###--- Run function to set desktop theme
 set_desktop ###--- Run function to set desktop background
 ### END STAGE 3 ###
@@ -242,7 +245,35 @@ else
 fi
 
 ###---	Init stages
+echo "###############################"
+echo "###---   Script stages   ---###"
+echo -e "###############################\n"
+echo "Run ALL stages: Press 0"
+echo "Run Stage 1: Press 1"
+echo "Run Stage 2: Press 2"
+echo "Run Stage 3: Press 3"
+read -n 1 STAGE
 
-stage_1 ###--- Run Stage 1!
-stage_2 ###--- Run Stage 2!
-stage_3 ###--- Run Stage 3!
+case "$STAGE" in
+	0)
+	stage_1 ###--- Run Stage 1!
+	stage_2 ###--- Run Stage 2!
+	stage_3 ###--- Run Stage 3!
+	;;
+	1)
+	stage_1 ###--- Run Stage 1!
+	;;
+	2)
+	stage_2 ###--- Run Stage 2!
+	;;
+	3)
+	stage_3 ###--- Run Stage 3!
+	;;
+	*)
+	echo -e "Invalid selection.\nExiting script..."
+	exit 1
+	;;
+esac
+
+
+
