@@ -11,8 +11,8 @@ echo -e "###--- Running Desktop config Stage 1 ---###\n Installing new packages.
 
 echo -e "Enabling additional repositories."
 echo -e "Enabling Alacritty repository."
-dnf copr enable pschyska/alacritty                   
-NEWPKG=(git zsh alacritty micro nmap btop keepassxc tmux)
+dnf copr enable pschyska/alacritty
+NEWPKG=(git zsh alacritty micro nmap btop keepassxc tmux ntfs-3g)
 
 echo -e "Installing packages through RPM...\n"
 for pkg in "${NEWPKG[@]}"; do
