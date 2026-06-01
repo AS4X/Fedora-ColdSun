@@ -54,11 +54,9 @@ else
     mv zen /opt/zen/ # "Installation"
 	#Registering application PATH
 	echo -e 'export PATH="$PATH:/opt/zen"' >> /home/$USERNAME/.zshrc
-	###########    Desktop Shortcut     ################
-	echo -e '[Desktop Entry]\n Name=Zen Browser\n Exec=/opt/zen/zen\n Comment=Web Browser\n Terminal=false\n Icon=/opt/zen/icons/icon.png\n Type=Application' > /home/$USERNAME/Desktop/zen.desktop
-	wget https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Zen_Browser_logo_%28red_circles%29.svg/1280px-Zen_Browser_logo_%28red_circles%29.svg.png #Icon download
-	mv 1280px-Zen_Browser_logo_\(red_circles\).svg.png /opt/zen/icons/icon.png
-	chmod +x /home/$USERNAME/Desktop/zen.desktop
+	###########    Zen Backup Install    ################
+	curl -fsSL "https://raw.githubusercontent.com/AS4X/Fedora-ColdSun/refs/heads/main/src/zen-config.tar" -o /home/$USERNAME/.config/zen/zen-config.tar
+	tar -xf /home/$USERNAME/.config/zen/zen-config.tar --directory /home/$USERNAME/.config/zen/
 fi
 
 ################# VS Code ####################
